@@ -1,0 +1,14 @@
+# Rác Python / môi trường ảo
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+env/
+
+# Rác hệ điều hành
+.DS_Store
+Thumbs.db
+*.log
+
+# Ghi chú: GIỮ LẠI các file model (.pt/.onnx) vì đều < 50MB, GitHub đẩy trực tiếp được.

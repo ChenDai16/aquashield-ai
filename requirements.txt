@@ -1,0 +1,18 @@
+# AquaShield AI — thư viện cần thiết để chạy app.py (web Gradio)
+# Cài: pip install -r requirements.txt
+#
+# GHI CHÚ: torch/torchvision bản CPU là đủ để chạy demo.
+# Nếu máy KHÔNG có GPU NVIDIA, cài bản CPU cho nhẹ & nhanh:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# rồi cài phần còn lại: pip install gradio pillow numpy matplotlib
+
+torch>=2.0
+torchvision>=0.15
+gradio>=4.0
+pillow>=9.0
+numpy>=1.23
+matplotlib>=3.5
+
+# (Tuỳ chọn) để chạy đánh giá & xuất ONNX cho bản mobile:
+# onnx>=1.15
+# onnxruntime>=1.16

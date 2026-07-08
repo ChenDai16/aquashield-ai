@@ -1,0 +1,11 @@
+Test accuracy (full official Test set): 98.05%  (n=256)
+
+class                precision    recall        f1  support
+BG (Đen mang)            0.969     0.984     0.977       64
+BG+WSSV                  0.954     0.969     0.961       64
+HS (Khỏe)                1.000     1.000     1.000       64
+WSSV (Đốm trắng)         1.000     0.969     0.984       64
+
+accuracy                                     0.980      256
+macro avg                0.981     0.980     0.981      256
+weighted avg             0.981     0.980     0.981      256
