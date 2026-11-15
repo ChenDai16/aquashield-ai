@@ -3,6 +3,7 @@
   "short_name": "AquaShield",
   "description": "Công cụ AI sàng lọc sớm sức khỏe tôm tại ao. Mô hình chạy ngay trên điện thoại, không cần mạng.",
   "lang": "vi",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

@@ -67,6 +67,14 @@
   .samples{display:flex; gap:8px; margin-top:8px;}
   .samples button{flex:1; border:1px solid var(--line); background:#fffdf8; border-radius:10px; padding:4px 4px 6px; font-size:11.5px; color:var(--muted); cursor:pointer;}
   .samples img{display:block; width:100%; height:52px; object-fit:cover; border-radius:7px; margin-bottom:3px;}
+  .install{background:var(--ocean); color:#fff;}
+  .install h2{margin:0 0 4px; font-size:18px;}
+  .install p{margin:0 0 12px; font-size:14px; color:var(--water);}
+  .install .btn{background:var(--teal); color:#06313a; width:100%; font-size:17px;}
+  .install .help{margin:12px 0 0; font-size:14.5px; color:#fff; background:rgba(255,255,255,.12); border-radius:10px; padding:10px 12px;}
+  .install .help ol{margin:6px 0 0; padding-left:20px;} .install .help li{margin:4px 0;}
+  .install a.later{display:block; text-align:center; margin-top:10px; font-size:13px; color:var(--water); text-decoration:underline;}
+  .qr{display:block; width:190px; height:190px; margin:8px auto 4px; border-radius:8px;}
   .hidden{display:none !important;}
   table{border-collapse:collapse; width:100%; font-size:13px; font-variant-numeric:tabular-nums;}
   th,td{border:1px solid var(--line); padding:6px 4px; text-align:center;}
@@ -104,6 +112,13 @@
 
   <!-- ===================== SÀNG LỌC ===================== -->
   <section id="tabScan">
+    <div class="card install hidden" id="installCard">
+      <h2 id="installTitle">Cài AquaShield AI vào điện thoại</h2>
+      <p id="installText">Cài một lần, sau đó mở từ màn hình chính và dùng được cả khi không có mạng. Không tốn phí, dung lượng khoảng 25 MB.</p>
+      <button class="btn" id="btnInstall">Cài đặt ứng dụng</button>
+      <div class="help hidden" id="installHelp"></div>
+      <a class="later" id="installLater" href="#">Dùng thử trước, cài sau</a>
+    </div>
     <div class="card">
       <div class="btns">
         <button class="btn" id="btnCam" disabled>Chụp ảnh</button>
@@ -189,6 +204,10 @@
         <li>Chưa được kiểm chứng trên ảnh chụp tại ao nuôi Việt Nam.</li>
         <li>Mô hình không biết từ chối ảnh không phải tôm; cổng chất lượng ảnh hiện chỉ xét độ sáng và độ nét.</li>
       </ul>
+      <h3>Chia sẻ ứng dụng</h3>
+      <p class="small" style="margin-top:0">Người khác mở camera, quét mã này rồi bấm "Cài đặt ứng dụng".</p>
+      <img class="qr" src="icons/qr.png" alt="Mã QR mở ứng dụng AquaShield AI">
+      <p class="small" style="text-align:center; margin-top:0">chendai16.github.io/aquashield-ai/app</p>
       <h3>Bảo trì</h3>
       <p class="small" style="margin-top:0">Sau khi thay tệp trên máy chủ, bấm nút dưới đây lúc đang có mạng để tải bản mới về máy.</p>
       <div class="btns"><button class="btn alt small" id="btnReset">Xóa bộ nhớ đệm và tải lại</button></div>
@@ -202,7 +221,7 @@
 "use strict";
 /* ============================== CẤU HÌNH ============================== */
 const CONFIG = {
-  CACHE: "aquashield-v1",                       // phải trùng với sw.js
+  CACHE: "aquashield-v2",                       // phải trùng với sw.js
   MODELS: [                                     // thử lần lượt, dùng tệp đầu tiên tải được
     { url: "model/aquashield_int8.onnx",      kind: "INT8",  report: "onnx_int8" },
     { url: "model/aquashield_fp32.onnx",      kind: "FP32",  report: "onnx_fp32" },
@@ -571,6 +590,50 @@ $("btnReset").addEventListener("click", async () => {
   try { await Promise.all((await caches.keys()).map((k) => caches.delete(k))); const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map((r) => r.unregister())); } catch (e) {}
   location.reload();
 });
+
+/* ============================== CÀI ĐẶT MỘT CHẠM ============================== */
+const UA = navigator.userAgent || "";
+const ENV = {
+  standalone: () => window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true,
+  ios: /iPad|iPhone|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1),
+  android: /Android/i.test(UA),
+  inApp: /Zalo|FBAN|FBAV|FB_IAB|Messenger|Instagram|Line\/|TikTok|MicroMessenger|; wv\)/i.test(UA)
+};
+let installEvent = null;
+function installHelp(html) { const h = $("installHelp"); h.innerHTML = html; h.classList.remove("hidden"); }
+const HELP_ANDROID = "Máy chưa hiện hộp cài đặt tự động. Làm tay 3 bước:<ol><li>Bấm dấu <b>⋮</b> ở góc trên bên phải.</li><li>Chọn <b>Thêm vào màn hình chính</b> (hoặc <b>Cài đặt ứng dụng</b>).</li><li>Bấm <b>Cài đặt</b>.</li></ol>";
+const HELP_IOS = "Trên iPhone, làm 3 bước:<ol><li>Bấm nút <b>Chia sẻ</b> (ô vuông có mũi tên hướng lên) ở thanh dưới của Safari.</li><li>Kéo xuống, chọn <b>Thêm vào MH chính</b>.</li><li>Bấm <b>Thêm</b>.</li></ol>";
+function setupInstall() {
+  if (ENV.standalone()) return;                                   // đang chạy như ứng dụng đã cài
+  try { if (sessionStorage.getItem("aqs_later")) return; } catch (e) {}
+  $("installCard").classList.remove("hidden");
+  if (ENV.inApp && ENV.android) $("btnInstall").textContent = "Mở bằng Chrome để cài";
+  else if (ENV.inApp && ENV.ios) { $("btnInstall").classList.add("hidden"); installHelp("Trình duyệt này không cài được ứng dụng. Bấm dấu <b>⋯</b> ở góc màn hình, chọn <b>Mở bằng Safari</b>, rồi bấm lại nút cài đặt."); }
+  else if (ENV.ios) $("btnInstall").textContent = "Cách cài trên iPhone";
+}
+$("btnInstall").addEventListener("click", async () => {
+  if (ENV.inApp && ENV.android) {
+    location.href = "intent://" + location.host + location.pathname + "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" + encodeURIComponent(location.href) + ";end";
+    setTimeout(() => installHelp("Nếu Chrome không tự mở: bấm dấu <b>⋮</b> hoặc <b>⋯</b> ở góc màn hình và chọn <b>Mở bằng trình duyệt</b>."), 1500);
+    return;
+  }
+  if (ENV.ios) { installHelp(HELP_IOS); return; }
+  if (!installEvent) { installHelp(HELP_ANDROID); return; }
+  const ev = installEvent; installEvent = null;
+  try { ev.prompt(); const choice = await ev.userChoice;
+        if (choice && choice.outcome === "accepted") installHelp("Đang cài. Vài giây nữa biểu tượng <b>AquaShield</b> sẽ có trên màn hình chính.");
+        else installHelp("Anh/chị chưa đồng ý cài. Bấm lại nút trên khi muốn cài."); }
+  catch (e) { installHelp(HELP_ANDROID); }
+});
+$("installLater").addEventListener("click", (e) => { e.preventDefault(); $("installCard").classList.add("hidden"); try { sessionStorage.setItem("aqs_later", "1"); } catch (err) {} });
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvent = e; $("installHelp").classList.add("hidden"); });
+window.addEventListener("appinstalled", () => {
+  installEvent = null; $("btnInstall").classList.add("hidden"); $("installLater").classList.add("hidden");
+  $("installTitle").textContent = "Đã cài xong";
+  $("installText").textContent = "Mở AquaShield từ biểu tượng trên màn hình chính. Lần đầu nên mở khi còn mạng, chờ nhãn “Ngoại tuyến: sẵn sàng”.";
+  $("installHelp").classList.add("hidden");
+});
+setupInstall();
 
 /* ============================== KHỞI ĐỘNG ============================== */
 (async () => { await loadModel(); setupOffline(); })();
