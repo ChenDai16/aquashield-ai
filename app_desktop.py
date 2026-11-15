@@ -149,7 +149,7 @@ class App(tk.Tk):
         top = tk.Frame(self, bg="#0f766e"); top.pack(fill="x")
         tk.Label(top, text="🦐 AquaShield AI", bg="#0f766e", fg="white",
                  font=("Segoe UI", 18, "bold")).pack(side="left", padx=16, pady=10)
-        tk.Label(top, text="ResNet-18 • 98% test acc. • AGRITECH 2026",
+        tk.Label(top, text="ResNet-18 • bản thử nghiệm • kiểm tra nội bộ n = 96: 93,75%",
                  bg="#0f766e", fg="#c7fdf3", font=("Segoe UI", 10)).pack(side="left", pady=10)
 
         bar = tk.Frame(self, bg="#f0fdfa"); bar.pack(fill="x", padx=16, pady=10)

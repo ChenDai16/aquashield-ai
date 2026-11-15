@@ -9,7 +9,7 @@ AquaShield AI — Phát hiện sớm bệnh trên tôm Sú (Penaeus monodon) qua
     • WSSV    — Hội chứng đốm trắng (White Spot Syndrome Virus)
 
 Mô hình: ResNet-18 (transfer learning) — resnet18_transfer.pt
-Độ chính xác kiểm định trên tập Test chính thức (256 ảnh): 98.05%.
+Kết quả kiểm tra nội bộ trên 96 ảnh đã loại trùng: đúng lớp 93,75%; độ nhạy với dấu hiệu đốm trắng 95,8%.
 
 CÁCH CHẠY (local, khuyến nghị)
 ------------------------------
@@ -275,7 +275,7 @@ def build_ui():
                    theme=gr.themes.Soft(primary_hue="teal"), css=CSS) as demo:
         gr.Markdown(
             "# 🦐 AquaShield AI\n"
-            "### Phát hiện sớm bệnh trên tôm Sú qua ảnh điện thoại — ResNet-18 (98% test acc.)",
+            "### Phát hiện sớm bệnh trên tôm Sú qua ảnh điện thoại — ResNet-18, bản thử nghiệm (kiểm tra nội bộ n = 96: 93,75%)",
             elem_id="title-md",
         )
         with gr.Row():
@@ -308,9 +308,9 @@ def build_ui():
 
         gr.Markdown(
             "---\n"
-            "**AquaShield AI** • Đề tài AGRITECH 2026 — Trần Quang Đại (Đại học Nha Trang). "
+            "**AquaShield AI** • Trần Quang Đại (Trường Đại học Nha Trang). "
             "Mô hình ResNet-18 transfer learning, 4 lớp. "
-            "*Bản demo hỗ trợ ra quyết định — không thay thế chẩn đoán thú y thuỷ sản.*"
+            "*Bản demo hỗ trợ ra quyết định — không thay thế xét nghiệm PCR và cán bộ thú y thuỷ sản.*"
         )
     return demo
 

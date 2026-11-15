@@ -1,0 +1,19 @@
+AQUASHIELD AI – ỨNG DỤNG CHẠY NGOẠI TUYẾN TRÊN ĐIỆN THOẠI (bản thử nghiệm)
+
+Địa chỉ sau khi đưa lên GitHub Pages:  https://chendai16.github.io/aquashield-ai/app/
+
+  index.html              giao diện và toàn bộ logic
+  sw.js                   lưu ứng dụng vào máy để chạy khi không có mạng
+  manifest.webmanifest    tên và biểu tượng khi cài lên màn hình chính
+  icons/  samples/        biểu tượng, 4 ảnh mẫu
+  ort/                    thư viện chạy mô hình trong máy (onnxruntime-web 1.19.2)
+  model/                  tệp mô hình INT8 và báo cáo kiểm định
+
+Cài trên điện thoại: mở địa chỉ trên khi có mạng > chờ "Ngoại tuyến: sẵn sàng" > Thêm vào màn hình chính
+> mở từ biểu tượng một lần khi còn mạng > từ đó dùng được ở chế độ máy bay.
+
+Khi thay tệp trên GitHub: mở ứng dụng lúc có mạng > Thông tin > "Xóa bộ nhớ đệm và tải lại".
+
+Chỉnh nhanh (mở index.html bằng Notepad, phần CẤU HÌNH ở đầu đoạn script):
+  REFUSE_BELOW   ngưỡng từ chối kết luận (0.55)
+  QUALITY.on     bật/tắt cổng chất lượng ảnh (true/false)

@@ -1,0 +1,18 @@
+Tập kiểm tra nội bộ sau khi loại ảnh trùng (640 ảnh, chia phân tầng 448/96/96, random_state = 42)
+Mô hình: ResNet-18 học chuyển giao, bản PyTorch FP32 (model/resnet18_transfer.pt)
+
+TEST ACCURACY (tap sach): 93.75%  (n=96)
+
+                  precision    recall  f1-score   support
+
+   BG (Den mang)      0.917     0.917     0.917        24
+         BG+WSSV      0.880     0.917     0.898        24
+       HS (Khoe)      0.960     1.000     0.980        24
+WSSV (Dom trang)      1.000     0.917     0.957        24
+
+        accuracy                          0.938        96
+       macro avg      0.939     0.937     0.938        96
+    weighted avg      0.939     0.938     0.938        96
+
+Gộp hai lớp có đốm trắng (WSSV, BG+WSSV) thành "có dấu hiệu đốm trắng":
+độ nhạy 46/48 = 95,8%; độ đặc hiệu 47/48 = 97,9%.

@@ -1,0 +1,6 @@
+aquashield_int8.onnx
+  ResNet-18, 4 lớp, lượng tử hóa động INT8, xuất từ model/resnet18_transfer.pt của kho mã này.
+  Đầu vào "input" [1,3,224,224]; đầu ra "probs" [1,4] và "cam" [1,4,7,7] (bản đồ nhiệt Grad-CAM).
+
+bao_cao_kiem_dinh_int8.json  (CHƯA CÓ – tạo bằng notebook AquaShield_KiemDinh_BanDienThoai.ipynb)
+  Kết quả chấm đúng tệp mô hình trên với 96 ảnh kiểm tra nội bộ. Khi có tệp này, tab "Thông tin" của ứng dụng tự hiện con số.

@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-evaluate.py — Đánh giá lại AquaShield AI trên tập Test chính thức.
+evaluate.py — Đánh giá AquaShield AI trên một thư mục ảnh có nhãn.
+
+LƯU Ý: thư mục "Test" gốc của bộ dữ liệu trùng 100% với ảnh huấn luyện (kiểm tra bằng MD5),
+nên KHÔNG dùng để báo cáo độ chính xác. Kết quả hợp lệ là trên 96 ảnh đã loại trùng
+(xem README và notebook kiểm định).
 Tạo: classification report, confusion matrix (PNG + CSV), accuracy.
 
 CÁCH CHẠY:
     python evaluate.py --data "ShrimpDiseaseDataset/Tiger Prawn Diseases/Test" \
                        --weights model/resnet18_transfer.pt --out results
 
-Kết quả tham chiếu (đã kiểm định): 98.05% trên 256 ảnh (64 ảnh × 4 lớp).
+Kết quả tham chiếu hợp lệ: 93,75% trên 96 ảnh kiểm tra nội bộ đã loại trùng (24 ảnh × 4 lớp).
 """
 import os, glob, argparse
 import numpy as np
