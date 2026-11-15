@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B4F6C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AquaShield">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<title>AquaShield AI</title>
+<style>
+  :root{ --ocean:#0B4F6C; --sand:#F4EFE4; --teal:#1FB5A8; --water:#BFF4FC;
+         --ink:#12303d; --muted:#5b7480; --card:#ffffff; --line:#e3ddd0;
+         --green:#16803c; --amber:#b45309; --red:#c81e1e; --deepred:#991b1b; --slate:#475569; }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif; background:var(--sand);
+       color:var(--ink); line-height:1.5; font-size:16px; padding-bottom:env(safe-area-inset-bottom);}
+  header{background:var(--ocean); color:#fff; padding:calc(12px + env(safe-area-inset-top)) 16px 12px;
+}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand img{width:38px; height:38px;}
+  .brand h1{margin:0; font-size:19px; letter-spacing:.2px;}
+  .brand p{margin:0; font-size:12.5px; color:var(--water);}
+  .chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;}
+  .chip{font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:999px; background:rgba(255,255,255,.14); color:#fff; white-space:nowrap;}
+  .chip.ok{background:var(--teal); color:#06313a;}
+  .chip.warn{background:#fbbf24; color:#422006;}
+  .chip.off{background:#fff; color:var(--ocean);}
+  nav{display:flex; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10;}
+  nav button{flex:1; border:0; background:none; padding:12px 4px; font-size:14px; font-weight:600; color:var(--muted);
+             border-bottom:3px solid transparent; cursor:pointer;}
+  nav button.on{color:var(--ocean); border-bottom-color:var(--teal);}
+  .wrap{max-width:600px; margin:0 auto; padding:14px;}
+  .card{background:var(--card); border-radius:14px; padding:16px; margin-bottom:14px; box-shadow:0 1px 4px rgba(11,79,108,.08);}
+  .btns{display:flex; gap:10px;}
+  .btn{flex:1; border:0; border-radius:12px; padding:15px 10px; font-size:16px; font-weight:700; color:#fff; background:var(--ocean); cursor:pointer;}
+  .btn.alt{background:#e7f6f8; color:var(--ocean);}
+  .btn.small{flex:none; padding:9px 14px; font-size:14px;}
+  .btn:disabled{opacity:.45;}
+  .btn:active{transform:scale(.985);}
+  label.fld{display:block; font-size:13px; color:var(--muted); margin:12px 0 4px;}
+  input[type=text]{width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 12px; font-size:16px; background:#fffdf8; color:var(--ink);}
+  .status{font-size:14px; color:var(--muted); margin-top:12px; text-align:center; min-height:21px;}
+  .imgbox{position:relative; margin-top:12px; border-radius:12px; overflow:hidden; background:#eef3f4; display:none;}
+  .imgbox img{display:block; width:100%; height:auto;}
+  .imgbox canvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; opacity:.6; display:none;}
+  .toggle{display:none; margin-top:10px; font-size:14px; color:var(--ocean); align-items:center; gap:8px;}
+  .toggle input{width:20px; height:20px;}
+  .band{border-radius:10px; color:#fff; font-weight:800; font-size:13px; letter-spacing:.4px; padding:6px 12px; display:inline-block;}
+  .rtitle{font-size:20px; font-weight:800; margin:10px 0 2px; line-height:1.3;}
+  .rconf{font-size:14px; color:var(--muted); margin:0 0 10px;}
+  .bars{margin:8px 0 2px;}
+  .bar-row{display:flex; align-items:center; gap:8px; margin:6px 0; font-size:13px;}
+  .bar-label{width:132px; flex:none; color:var(--muted);}
+  .bar-track{flex:1; height:14px; background:#eef2f3; border-radius:7px; overflow:hidden;}
+  .bar-fill{height:100%; background:var(--teal); width:0; transition:width .4s;}
+  .bar-val{width:50px; flex:none; text-align:right; font-variant-numeric:tabular-nums; font-weight:600;}
+  h3{font-size:14px; color:var(--ocean); margin:14px 0 4px; text-transform:uppercase; letter-spacing:.4px;}
+  ul.todo{margin:0; padding-left:20px;} ul.todo li{margin:5px 0; font-size:15px;}
+  p.note{font-size:14px; margin:6px 0 0; color:var(--ink);}
+  p.small{font-size:12.5px; color:var(--muted); margin:10px 0 0;}
+  .samples{display:flex; gap:8px; margin-top:8px;}
+  .samples button{flex:1; border:1px solid var(--line); background:#fffdf8; border-radius:10px; padding:4px 4px 6px; font-size:11.5px; color:var(--muted); cursor:pointer;}
+  .samples img{display:block; width:100%; height:52px; object-fit:cover; border-radius:7px; margin-bottom:3px;}
+  .install{background:var(--ocean); color:#fff;}
+  .install h2{margin:0 0 4px; font-size:18px;}
+  .install p{margin:0 0 12px; font-size:14px; color:var(--water);}
+  .install .btn{background:var(--teal); color:#06313a; width:100%; font-size:17px;}
+  .install .help{margin:12px 0 0; font-size:14.5px; color:#fff; background:rgba(255,255,255,.12); border-radius:10px; padding:10px 12px;}
+  .install .help ol{margin:6px 0 0; padding-left:20px;} .install .help li{margin:4px 0;}
+  .install a.later{display:block; text-align:center; margin-top:10px; font-size:13px; color:var(--water); text-decoration:underline;}
+  .qr{display:block; width:190px; height:190px; margin:8px auto 4px; border-radius:8px;}
+  .hidden{display:none !important;}
+  table{border-collapse:collapse; width:100%; font-size:13px; font-variant-numeric:tabular-nums;}
+  th,td{border:1px solid var(--line); padding:6px 4px; text-align:center;}
+  th{background:#f5f1e8; font-weight:700;}
+  td.diag{background:#dff6f3; font-weight:700;}
+  .kv{display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:14.5px;}
+  .kv b{font-variant-numeric:tabular-nums;}
+  .log-item{display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--line); font-size:14px;}
+  .dot{width:12px; height:12px; border-radius:50%; flex:none; margin-top:5px;}
+  .log-item small{color:var(--muted); display:block;}
+  .spinner{width:18px; height:18px; border:3px solid #cfe7ea; border-top-color:var(--ocean); border-radius:50%; animation:spin .8s linear infinite; display:inline-block; vertical-align:-3px; margin-right:6px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img src="icons/logo-96.png" alt="">
+    <div><h1>AquaShield AI</h1><p>Công cụ AI sàng lọc sớm sức khỏe tôm tại ao</p></div>
+  </div>
+  <div class="chips">
+    <span class="chip" id="chipModel">Mô hình: đang tải…</span>
+    <span class="chip" id="chipOffline">Ngoại tuyến: đang chuẩn bị…</span>
+    <span class="chip" id="chipNet">Mạng: …</span>
+  </div>
+</header>
+<nav>
+  <button data-tab="tabScan" class="on">Sàng lọc</button>
+  <button data-tab="tabLog">Nhật ký</button>
+  <button data-tab="tabVal">Kiểm định</button>
+  <button data-tab="tabInfo">Thông tin</button>
+</nav>
+
+<div class="wrap">
+
+  <!-- ===================== SÀNG LỌC ===================== -->
+  <section id="tabScan">
+    <div class="card install hidden" id="installCard">
+      <h2 id="installTitle">Cài AquaShield AI vào điện thoại</h2>
+      <p id="installText">Cài một lần, sau đó mở từ màn hình chính và dùng được cả khi không có mạng. Không tốn phí, dung lượng khoảng 25 MB.</p>
+      <button class="btn" id="btnInstall">Cài đặt ứng dụng</button>
+      <div class="help hidden" id="installHelp"></div>
+      <a class="later" id="installLater" href="#">Dùng thử trước, cài sau</a>
+    </div>
+    <div class="card">
+      <div class="btns">
+        <button class="btn" id="btnCam" disabled>Chụp ảnh</button>
+        <button class="btn alt" id="btnGal" disabled>Chọn ảnh</button>
+      </div>
+      <input id="fileCam" type="file" accept="image/*" capture="environment" class="hidden">
+      <input id="fileGal" type="file" accept="image/*" class="hidden">
+      <label class="fld" for="pond">Tên ao (không bắt buộc, để ghi nhật ký)</label>
+      <input type="text" id="pond" placeholder="Ví dụ: Ao 3" autocomplete="off">
+      <label class="fld">Chưa có tôm để chụp? Thử ảnh mẫu</label>
+      <div class="samples" id="samples">
+        <button data-s="hs"><img src="samples/hs_t.jpg" alt="">Mẫu 1</button>
+        <button data-s="bg"><img src="samples/bg_t.jpg" alt="">Mẫu 2</button>
+        <button data-s="wssv"><img src="samples/wssv_t.jpg" alt="">Mẫu 3</button>
+        <button data-s="bg_wssv"><img src="samples/bg_wssv_t.jpg" alt="">Mẫu 4</button>
+      </div>
+      <p class="small" style="margin-top:6px">Ảnh mẫu lấy từ bộ dữ liệu mở ShrimpDiseaseImageBD; mô hình có thể đã gặp các ảnh này khi huấn luyện.</p>
+      <div class="imgbox" id="imgbox"><img id="preview" alt="Ảnh tôm vừa chọn"><canvas id="heat"></canvas></div>
+      <label class="toggle" id="heatToggle"><input type="checkbox" id="heatOn" checked> Hiện vùng ảnh mô hình dựa vào (Grad-CAM)</label>
+      <div class="status" id="status">Đang tải mô hình…</div>
+    </div>
+
+    <div class="card hidden" id="resultCard">
+      <span class="band" id="rBand"></span>
+      <div class="rtitle" id="rTitle"></div>
+      <p class="rconf" id="rConf"></p>
+      <div class="bars" id="bars"></div>
+      <p class="note" id="rNote"></p>
+      <h3 id="rTodoHead">Việc cần làm trong 24 giờ</h3>
+      <ul class="todo" id="rTodo"></ul>
+      <div class="btns hidden" id="forceRow" style="margin-top:12px"><button class="btn alt small" id="btnForce">Vẫn phân tích ảnh này</button></div>
+      <p class="small">Công cụ sàng lọc dấu hiệu trên ảnh; không thay thế xét nghiệm PCR và cán bộ thú y thủy sản, không dùng để kê thuốc. Kết quả chỉ nói về con tôm trong ảnh vừa chụp.</p>
+    </div>
+  </section>
+
+  <!-- ===================== NHẬT KÝ ===================== -->
+  <section id="tabLog" class="hidden">
+    <div class="card">
+      <h3 style="margin-top:0">Nhật ký sàng lọc trên máy này</h3>
+      <p class="small" style="margin-top:0">Lưu trong điện thoại, không gửi đi đâu. Giữ 200 lượt gần nhất.</p>
+      <div id="logList"></div>
+      <div class="btns" style="margin-top:12px">
+        <button class="btn alt small" id="btnLogCsv">Xuất tệp CSV</button>
+        <button class="btn alt small" id="btnLogClear">Xóa nhật ký</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== KIỂM ĐỊNH ===================== -->
+  <section id="tabVal" class="hidden">
+    <div class="card">
+      <h3 style="margin-top:0">Chấm lại mô hình ngay trên máy này</h3>
+      <p class="note">Chọn cùng lúc các ảnh kiểm tra có nhãn trong tên tệp (ví dụ <b>WSSV__012.jpg</b>, <b>BG_WSSV__040.jpg</b>, <b>HS__077.jpg</b>, <b>BG__003.jpg</b>). Ứng dụng chạy từng ảnh và tính độ nhạy, độ đặc hiệu, ma trận nhầm lẫn.</p>
+      <div class="btns" style="margin-top:12px"><button class="btn" id="btnVal" disabled>Chọn bộ ảnh kiểm tra</button></div>
+      <input id="fileVal" type="file" accept="image/*" multiple class="hidden">
+      <div class="status" id="valStatus"></div>
+    </div>
+    <div class="card hidden" id="valCard">
+      <div id="valSummary"></div>
+      <h3>Ma trận nhầm lẫn (hàng: nhãn thật · cột: mô hình đoán)</h3>
+      <div id="valCm"></div>
+      <div class="btns" style="margin-top:12px"><button class="btn alt small" id="btnValCsv">Xuất kết quả từng ảnh (CSV)</button></div>
+      <p class="small">Phần kiểm định chấm theo lớp có xác suất cao nhất, không áp dụng cổng chất lượng ảnh. Số ảnh dưới ngưỡng 55% được đếm riêng.</p>
+    </div>
+  </section>
+
+  <!-- ===================== THÔNG TIN ===================== -->
+  <section id="tabInfo" class="hidden">
+    <div class="card">
+      <h3 style="margin-top:0">Bản thử nghiệm</h3>
+      <div class="kv"><span>Mô hình</span><b id="iModel">…</b></div>
+      <div class="kv"><span>Chạy ở đâu</span><b>Ngay trên máy này</b></div>
+      <div class="kv"><span>Ảnh có rời khỏi máy không</span><b>Không</b></div>
+      <div class="kv"><span>Ngưỡng từ chối kết luận</span><b>dưới 55%</b></div>
+      <div class="kv"><span>Thời gian lượt gần nhất</span><b id="iMs">chưa chạy</b></div>
+      <div class="kv"><span>Lưu ngoại tuyến</span><b id="iOffline">…</b></div>
+      <h3>Kết quả kiểm định của tệp mô hình này</h3>
+      <p class="note" id="iMetrics">Chưa có báo cáo kiểm định đi kèm tệp mô hình.</p>
+      <h3>Giới hạn cần biết</h3>
+      <ul class="todo">
+        <li>Chỉ dành cho tôm sú; nhận biết 4 nhóm: tôm khỏe, đen mang, dấu hiệu đốm trắng, đen mang kèm đốm trắng.</li>
+        <li>Ảnh huấn luyện và kiểm tra chủ yếu lấy từ bộ dữ liệu mở ShrimpDiseaseImageBD (Islam và cộng sự, 2024, Mendeley Data, doi:10.17632/jhrtdj9txm.2, giấy phép CC BY 4.0), chưa đối chiếu PCR.</li>
+        <li>Chưa được kiểm chứng trên ảnh chụp tại ao nuôi Việt Nam.</li>
+        <li>Mô hình không biết từ chối ảnh không phải tôm; cổng chất lượng ảnh hiện chỉ xét độ sáng và độ nét.</li>
+      </ul>
+      <h3>Chia sẻ ứng dụng</h3>
+      <p class="small" style="margin-top:0">Người khác mở camera, quét mã này rồi bấm "Cài đặt ứng dụng".</p>
+      <img class="qr" src="icons/qr.png" alt="Mã QR mở ứng dụng AquaShield AI">
+      <p class="small" style="text-align:center; margin-top:0">chendai16.github.io/aquashield-ai/app</p>
+      <h3>Bảo trì</h3>
+      <p class="small" style="margin-top:0">Sau khi thay tệp trên máy chủ, bấm nút dưới đây lúc đang có mạng để tải bản mới về máy.</p>
+      <div class="btns"><button class="btn alt small" id="btnReset">Xóa bộ nhớ đệm và tải lại</button></div>
+      <p class="small">AquaShield AI · Dự án HS32, Cuộc thi Khởi nghiệp sáng tạo Khánh Hòa 2026 · Trần Quang Đại, Trường Đại học Nha Trang.</p>
+    </div>
+  </section>
+</div>
+
+<script src="ort/ort.wasm.min.js"></script>
+<script>
+"use strict";
+/* ============================== CẤU HÌNH ============================== */
+const CONFIG = {
+  CACHE: "aquashield-v2",                       // phải trùng với sw.js
+  MODELS: [                                     // thử lần lượt, dùng tệp đầu tiên tải được
+    { url: "model/aquashield_int8.onnx",      kind: "INT8",  report: "onnx_int8" },
+    { url: "model/aquashield_fp32.onnx",      kind: "FP32",  report: "onnx_fp32" },
+    { url: "model/resnet18_shrimp_int8.onnx", kind: "INT8 (bản cũ)", report: null },
+    { url: "model/resnet18_shrimp.onnx",      kind: "FP32 (bản cũ)", report: null }
+  ],
+  REPORT_URL: "model/bao_cao_kiem_dinh_int8.json",
+  REFUSE_BELOW: 0.55,                           // dưới ngưỡng này: không kết luận, yêu cầu chụp lại
+  QUALITY: { on: true, tooDark: 40, tooBright: 245, blurVar: 12 },   // cổng chất lượng ảnh (độ sáng 0–255, độ nét)
+  LOG_MAX: 200
+};
+const KEYS  = ["BG", "BG_WSSV", "HS", "WSSV"];                     // đúng thứ tự lớp lúc huấn luyện
+const SHORT = { BG: "Đen mang", BG_WSSV: "Đen mang + đốm trắng", HS: "Tôm khỏe", WSSV: "Đốm trắng" };
+const MEAN = [0.485, 0.456, 0.406], STD = [0.229, 0.224, 0.225];
+const INFO = {
+  HS: { band: "XANH · BÌNH THƯỜNG", color: "var(--green)", title: "Chưa thấy dấu hiệu bất thường trên ảnh này",
+        note: "Kết quả chỉ nói về con tôm trong ảnh, không đại diện cho cả ao.",
+        todo: ["Tiếp tục kiểm tra định kỳ; mỗi ao chụp nhiều con ở nhiều vị trí.",
+               "Theo dõi sức ăn, oxy, pH và khí độc như thường lệ.",
+               "Nếu tôm bỏ ăn, tấp mé hoặc chết rải rác, hãy gửi mẫu xét nghiệm dù ảnh báo bình thường."] },
+  BG: { band: "VÀNG · CẢNH BÁO", color: "var(--amber)", title: "Dấu hiệu nghi đen mang",
+        note: "Mang sậm màu có thể do chất lượng nước, nấm, vi khuẩn hoặc sinh vật bám. Ảnh không xác định được nguyên nhân.",
+        todo: ["Đo ngay oxy hòa tan, NH₃, NO₂⁻, H₂S và kiểm tra lượng hữu cơ đáy ao.",
+               "Giảm lượng thức ăn, tăng sục khí; siphon đáy hoặc thay nước nếu chỉ tiêu xấu.",
+               "Lấy 5–10 con soi tươi mang, hoặc gửi mẫu cho cán bộ thú y thủy sản.",
+               "Chụp lại sau 24 giờ để theo dõi diễn biến."] },
+  WSSV: { band: "ĐỎ · NGUY CƠ CAO", color: "var(--red)", title: "Dấu hiệu nghi đốm trắng",
+        note: "Đốm trắng trên vỏ cũng có thể do vi khuẩn hoặc khoáng. Chỉ xét nghiệm PCR mới khẳng định được virus đốm trắng (WSSV).",
+        todo: ["Gửi mẫu xét nghiệm PCR ngay trong hôm nay.",
+               "Cách ly ao nghi ngờ: dùng riêng dụng cụ, không xả nước ra kênh chung, hạn chế người qua lại.",
+               "Báo cán bộ thú y thủy sản hoặc kỹ thuật phụ trách.",
+               "Trong lúc chờ kết quả: theo dõi sức ăn và tôm tấp mé; chuẩn bị phương án thu hoạch nếu tôm đạt cỡ."] },
+  BG_WSSV: { band: "ĐỎ · NGUY CƠ RẤT CAO", color: "var(--deepred)", title: "Dấu hiệu nghi đen mang kèm đốm trắng",
+        note: "Hai nhóm dấu hiệu cùng xuất hiện trên ảnh. Chỉ xét nghiệm PCR mới khẳng định được virus đốm trắng (WSSV).",
+        todo: ["Gửi mẫu xét nghiệm PCR ngay trong hôm nay.",
+               "Cách ly ao nghi ngờ: dùng riêng dụng cụ, không xả nước ra kênh chung, hạn chế người qua lại.",
+               "Báo cán bộ thú y thủy sản hoặc kỹ thuật phụ trách.",
+               "Đồng thời đo oxy, khí độc và kiểm tra đáy ao.",
+               "Chuẩn bị phương án thu hoạch nếu tôm đạt cỡ."] }
+};
+const RETAKE_TIPS = ["Chụp ở nơi đủ sáng, tránh bóng đổ và ánh phản chiếu.",
+                     "Đặt tôm trên nền sạch, tốt nhất là khay chụp chuẩn.",
+                     "Chụp ngang thân, thấy rõ mang và vỏ giáp đầu ngực.",
+                     "Giữ chắc tay, cách con tôm khoảng 15–20 cm.",
+                     "Nếu chụp lại vẫn chưa kết luận được mà tôm có biểu hiện lạ, hãy gửi mẫu xét nghiệm."];
+
+/* ============================== TIỆN ÍCH ============================== */
+const $ = (id) => document.getElementById(id);
+const pct = (x) => (x * 100).toFixed(1).replace(".", ",") + "%";
+const state = { session: null, model: null, hasCam: false, lastImg: null, lastCam: null, valRows: [] };
+function setStatus(html) { $("status").innerHTML = html; }
+function chip(id, text, cls) { const e = $(id); e.textContent = text; e.className = "chip" + (cls ? " " + cls : ""); }
+
+/* ---------- Tab ---------- */
+document.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("nav button").forEach((x) => x.classList.toggle("on", x === b));
+  ["tabScan", "tabLog", "tabVal", "tabInfo"].forEach((t) => $(t).classList.toggle("hidden", t !== b.dataset.tab));
+  if (b.dataset.tab === "tabLog") renderLog();
+}));
+
+/* ---------- Trạng thái mạng ---------- */
+function showNet() { navigator.onLine ? chip("chipNet", "Mạng: đang bật") : chip("chipNet", "Không có mạng · vẫn chạy", "off"); }
+window.addEventListener("online", showNet); window.addEventListener("offline", showNet); showNet();
+
+/* ============================== TẢI MÔ HÌNH (có lưu vào máy) ============================== */
+async function fetchCached(url) {
+  let cache = null;
+  try { cache = await caches.open(CONFIG.CACHE); } catch (e) { /* trình duyệt không cho dùng bộ nhớ đệm */ }
+  if (cache) { const hit = await cache.match(url); if (hit) return hit; }
+  const res = await fetch(url, { cache: "no-cache" });
+  if (!res.ok) throw new Error(url + " → HTTP " + res.status);
+  if (cache) { try { await cache.put(url, res.clone()); } catch (e) { console.warn("Không lưu được vào máy:", url, e); } }
+  return res;
+}
+
+async function loadModel() {
+  ort.env.wasm.wasmPaths = { mjs: new URL("ort/ort-wasm-simd-threaded.js", location.href).href,
+                            wasm: new URL("ort/ort-wasm-simd-threaded.wasm", location.href).href };
+  ort.env.wasm.numThreads = 1;
+  let lastErr = null;
+  for (const m of CONFIG.MODELS) {
+    try {
+      const res = await fetchCached(m.url);
+      const buf = await res.arrayBuffer();
+      const session = await ort.InferenceSession.create(buf, { executionProviders: ["wasm"] });
+      if (!session.inputNames.includes("input") || !session.outputNames.includes("probs")) throw new Error("Tệp mô hình không có đầu vào 'input' / đầu ra 'probs'");
+      state.session = session; state.model = Object.assign({ mb: buf.byteLength / 1e6 }, m);
+      state.hasCam = session.outputNames.includes("cam");
+      break;
+    } catch (e) { if (!lastErr || !/HTTP 404/.test(String(e.message))) lastErr = lastErr && !/HTTP 404/.test(String(lastErr.message)) ? lastErr : e; console.warn("Bỏ qua", m.url, e); }
+  }
+  if (!state.session) {
+    chip("chipModel", "Mô hình: chưa có", "warn");
+    setStatus("Chưa tải được mô hình. Hãy kiểm tra đã đặt tệp <b>aquashield_int8.onnx</b> vào thư mục <b>model</b>, rồi mở lại khi có mạng.<br><small>" + (lastErr ? String(lastErr.message || lastErr) : "") + "</small>");
+    return;
+  }
+  const label = "ResNet-18 " + state.model.kind + " · " + state.model.mb.toFixed(1).replace(".", ",") + " MB";
+  chip("chipModel", "Mô hình: " + label, "ok"); $("iModel").textContent = label;
+  ["btnCam", "btnGal", "btnVal"].forEach((b) => $(b).disabled = false);
+  setStatus("Sẵn sàng. Hãy chụp hoặc chọn một ảnh tôm sú.");
+  loadReport();
+}
+
+async function loadReport() {
+  if (!state.model.report) return;
+  try {
+    const r = await (await fetchCached(CONFIG.REPORT_URL)).json();
+    const k = r[state.model.report]; if (!k) return;
+    $("iMetrics").textContent = "Bản " + state.model.kind + " trên " + k.n + " ảnh kiểm tra nội bộ: độ nhạy với dấu hiệu đốm trắng " +
+      k.nhay_tp + "/" + k.nhay_n + " (" + pct(k.nhay_tp / k.nhay_n) + "), độ đặc hiệu " + k.dac_hieu_tn + "/" + k.dac_hieu_n +
+      " (" + pct(k.dac_hieu_tn / k.dac_hieu_n) + "), đúng lớp " + k.dung + "/" + k.n + " (" + pct(k.dung / k.n) + ").";
+  } catch (e) { /* không có báo cáo đi kèm */ }
+}
+
+/* ============================== TIỀN XỬ LÝ ẢNH ============================== */
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => resolve({ img, url }); img.onerror = () => reject(new Error("Không đọc được ảnh"));
+    img.src = url;
+  });
+}
+/* Thu ảnh về 224×224 (ép cả khung như lúc huấn luyện), thu nhỏ từng nấc để không răng cưa. */
+function to224(img) {
+  let w = img.naturalWidth || img.width, h = img.naturalHeight || img.height, src = img;
+  while (w > 448 || h > 448) {
+    const nw = Math.max(224, Math.round(w / 2)), nh = Math.max(224, Math.round(h / 2));
+    const c = document.createElement("canvas"); c.width = nw; c.height = nh;
+    const x = c.getContext("2d"); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = "high";
+    x.drawImage(src, 0, 0, w, h, 0, 0, nw, nh); src = c; w = nw; h = nh;
+  }
+  const c = document.createElement("canvas"); c.width = 224; c.height = 224;
+  const x = c.getContext("2d", { willReadFrequently: true }); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = "high";
+  x.drawImage(src, 0, 0, w, h, 0, 0, 224, 224);
+  return x.getImageData(0, 0, 224, 224).data;
+}
+function toTensor(d) {
+  const n = 224 * 224, arr = new Float32Array(3 * n);
+  for (let i = 0; i < n; i++) {
+    arr[i]         = (d[i * 4]     / 255 - MEAN[0]) / STD[0];
+    arr[n + i]     = (d[i * 4 + 1] / 255 - MEAN[1]) / STD[1];
+    arr[2 * n + i] = (d[i * 4 + 2] / 255 - MEAN[2]) / STD[2];
+  }
+  return new ort.Tensor("float32", arr, [1, 3, 224, 224]);
+}
+/* Cổng chất lượng ảnh: độ sáng trung bình và độ nét (phương sai Laplacian trên ảnh xám 224×224). */
+function quality(d) {
+  const n = 224 * 224, g = new Float32Array(n); let sum = 0;
+  for (let i = 0; i < n; i++) { const y = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2]; g[i] = y; sum += y; }
+  const mean = sum / n; let s = 0, s2 = 0, k = 0;
+  for (let r = 1; r < 223; r++) for (let c = 1; c < 223; c++) {
+    const i = r * 224 + c, l = 4 * g[i] - g[i - 1] - g[i + 1] - g[i - 224] - g[i + 224]; s += l; s2 += l * l; k++;
+  }
+  const v = s2 / k - (s / k) * (s / k), Q = CONFIG.QUALITY;
+  let problem = null;
+  if (mean < Q.tooDark) problem = "Ảnh quá tối";
+  else if (mean > Q.tooBright) problem = "Ảnh quá sáng, bị cháy";
+  else if (v < Q.blurVar) problem = "Ảnh bị mờ hoặc thiếu chi tiết";
+  return { mean, blur: v, problem };
+}
+
+/* ============================== SUY LUẬN ============================== */
+async function infer(pixels) {
+  const t0 = performance.now();
+  const out = await state.session.run({ input: toTensor(pixels) });
+  const ms = performance.now() - t0;
+  const probs = Array.from(out.probs.data);
+  let top = 0; for (let i = 1; i < 4; i++) if (probs[i] > probs[top]) top = i;
+  let cam = null;
+  if (state.hasCam && out.cam) { const a = out.cam.data; cam = Array.from(a.slice(top * 49, top * 49 + 49)); }
+  return { probs, top, cam, ms };
+}
+
+async function analyse(force) {
+  const it = state.lastImg; if (!it || !state.session) return;
+  setStatus('<span class="spinner"></span>Đang phân tích…');
+  try {
+    const px = to224(it.img);
+    const q = quality(px);
+    if (CONFIG.QUALITY.on && q.problem && !force) { renderQuality(q); setStatus("Ảnh chưa đạt chất lượng để phân tích."); return; }
+    const r = await infer(px);
+    $("iMs").textContent = Math.round(r.ms) + " ms";
+    state.lastCam = r.cam; render(r); drawHeat();
+    addLog(r);
+    setStatus("Xong trong " + Math.round(r.ms) + " ms. Có thể chụp hoặc chọn ảnh khác.");
+  } catch (e) { console.error(e); setStatus("Lỗi khi phân tích: " + (e.message || e)); }
+}
+
+/* ============================== HIỂN THỊ ============================== */
+function fillList(items) { $("rTodo").innerHTML = items.map((t) => "<li>" + t + "</li>").join(""); }
+function render(r) {
+  const conf = r.probs[r.top], key = KEYS[r.top], refused = conf < CONFIG.REFUSE_BELOW;
+  $("resultCard").classList.remove("hidden"); $("forceRow").classList.add("hidden");
+  if (refused) {
+    $("rBand").textContent = "CHƯA KẾT LUẬN"; $("rBand").style.background = "var(--slate)";
+    $("rTitle").textContent = "Chưa đủ chắc để kết luận. Hãy chụp lại.";
+    $("rConf").textContent = "Độ tin cậy cao nhất chỉ đạt " + pct(conf) + ", dưới ngưỡng 55%. Ứng dụng không đưa ra nhận định cho ảnh này.";
+    $("bars").innerHTML = ""; $("rNote").textContent = "";
+    $("rTodoHead").textContent = "Cách chụp lại"; fillList(RETAKE_TIPS);
+    $("heatToggle").style.display = "none"; $("heat").style.display = "none";
+  } else {
+    const info = INFO[key];
+    $("rBand").textContent = info.band; $("rBand").style.background = info.color;
+    $("rTitle").textContent = info.title;
+    $("rConf").textContent = "Độ tin cậy " + pct(conf);
+    const order = r.probs.map((p, i) => [p, i]).sort((a, b) => b[0] - a[0]);
+    $("bars").innerHTML = order.map(([p, i]) => '<div class="bar-row"><div class="bar-label">' + SHORT[KEYS[i]] +
+      '</div><div class="bar-track"><div class="bar-fill" style="width:' + (p * 100).toFixed(1) + '%"></div></div><div class="bar-val">' + pct(p) + "</div></div>").join("");
+    $("rNote").textContent = info.note;
+    $("rTodoHead").textContent = "Việc cần làm trong 24 giờ"; fillList(info.todo);
+    $("heatToggle").style.display = state.lastCam ? "flex" : "none";
+  }
+  $("resultCard").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function renderQuality(q) {
+  $("resultCard").classList.remove("hidden");
+  $("rBand").textContent = "ẢNH CHƯA ĐẠT"; $("rBand").style.background = "var(--slate)";
+  $("rTitle").textContent = q.problem + ". Hãy chụp lại.";
+  $("rConf").textContent = "Ứng dụng chưa phân tích ảnh này để tránh kết luận sai.";
+  $("bars").innerHTML = ""; $("rNote").textContent = "";
+  $("rTodoHead").textContent = "Cách chụp lại"; fillList(RETAKE_TIPS.slice(0, 4));
+  $("forceRow").classList.remove("hidden");
+  $("heatToggle").style.display = "none"; $("heat").style.display = "none";
+  $("resultCard").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+/* Bản đồ nhiệt: lưới 7×7 của lớp được chọn, kéo giãn mượt phủ lên ảnh. */
+function drawHeat() {
+  const cv = $("heat"), cam = state.lastCam;
+  if (!cam || !$("heatOn").checked || $("heatToggle").style.display === "none") { cv.style.display = "none"; return; }
+  const mx = Math.max.apply(null, cam) || 1;
+  const small = document.createElement("canvas"); small.width = 7; small.height = 7;
+  const sx = small.getContext("2d"), im = sx.createImageData(7, 7);
+  for (let i = 0; i < 49; i++) {
+    const v = Math.max(0, cam[i] / mx);                       // 0..1
+    const r = Math.round(255 * Math.min(1, Math.max(0, 1.5 - Math.abs(4 * v - 3))));
+    const g = Math.round(255 * Math.min(1, Math.max(0, 1.5 - Math.abs(4 * v - 2))));
+    const b = Math.round(255 * Math.min(1, Math.max(0, 1.5 - Math.abs(4 * v - 1))));
+    im.data[i * 4] = r; im.data[i * 4 + 1] = g; im.data[i * 4 + 2] = b; im.data[i * 4 + 3] = Math.round(235 * Math.pow(v, 1.3));   // vùng ít quan trọng thì trong suốt
+  }
+  sx.putImageData(im, 0, 0);
+  cv.width = 448; cv.height = 448;
+  const x = cv.getContext("2d"); x.clearRect(0, 0, 448, 448); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = "high";
+  x.drawImage(small, 0, 0, 448, 448);
+  cv.style.display = "block";
+}
+$("heatOn").addEventListener("change", drawHeat);
+
+/* ============================== CHỌN ẢNH ============================== */
+async function handleFile(file) {
+  if (!file) return;
+  try {
+    if (state.lastImg) URL.revokeObjectURL(state.lastImg.url);
+    state.lastImg = await loadImage(file); state.lastCam = null;
+    $("preview").src = state.lastImg.url; $("imgbox").style.display = "block"; $("heat").style.display = "none";
+    await analyse(false);
+  } catch (e) { setStatus("Không đọc được ảnh này. Hãy thử ảnh khác."); }
+}
+$("btnCam").addEventListener("click", () => $("fileCam").click());
+$("btnGal").addEventListener("click", () => $("fileGal").click());
+$("fileCam").addEventListener("change", (e) => { handleFile(e.target.files[0]); e.target.value = ""; });
+$("fileGal").addEventListener("change", (e) => { handleFile(e.target.files[0]); e.target.value = ""; });
+$("btnForce").addEventListener("click", () => analyse(true));
+document.querySelectorAll("#samples button").forEach((b) => b.addEventListener("click", async () => {
+  if (!state.session) return;
+  try { const blob = await (await fetchCached("samples/" + b.dataset.s + ".jpg")).blob(); handleFile(blob); }
+  catch (e) { setStatus("Không mở được ảnh mẫu."); }
+}));
+
+/* ============================== NHẬT KÝ ============================== */
+function readLog() { try { return JSON.parse(localStorage.getItem("aqs_log") || "[]"); } catch (e) { return []; } }
+function addLog(r) {
+  const conf = r.probs[r.top], refused = conf < CONFIG.REFUSE_BELOW;
+  const log = readLog();
+  log.unshift({ t: Date.now(), ao: $("pond").value.trim(), k: refused ? "REFUSED" : KEYS[r.top], c: Math.round(conf * 1000) / 1000 });
+  try { localStorage.setItem("aqs_log", JSON.stringify(log.slice(0, CONFIG.LOG_MAX))); } catch (e) { /* bộ nhớ đầy hoặc bị chặn */ }
+}
+const LOGCOLOR = { HS: "var(--green)", BG: "var(--amber)", WSSV: "var(--red)", BG_WSSV: "var(--deepred)", REFUSED: "var(--slate)" };
+const LOGNAME = { HS: "Chưa thấy bất thường", BG: "Nghi đen mang", WSSV: "Nghi đốm trắng", BG_WSSV: "Nghi đen mang kèm đốm trắng", REFUSED: "Chưa kết luận, yêu cầu chụp lại" };
+function renderLog() {
+  const log = readLog();
+  $("logList").innerHTML = log.length ? log.map((e) => '<div class="log-item"><span class="dot" style="background:' + LOGCOLOR[e.k] +
+    '"></span><div><b>' + LOGNAME[e.k] + "</b> · " + pct(e.c) + "<small>" + new Date(e.t).toLocaleString("vi-VN") + (e.ao ? " · " + escapeHtml(e.ao) : "") + "</small></div></div>").join("")
+    : '<p class="note">Chưa có lượt sàng lọc nào.</p>';
+}
+function escapeHtml(s) { return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function download(name, text) {
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + text], { type: "text/csv;charset=utf-8" }));
+  a.download = name; document.body.appendChild(a); a.click(); a.remove();
+}
+$("btnLogCsv").addEventListener("click", () => {
+  const rows = readLog().map((e) => [new Date(e.t).toISOString(), '"' + (e.ao || "").replace(/"/g, '""') + '"', e.k, e.c].join(","));
+  download("aquashield_nhat_ky.csv", "thoi_gian,ao,ket_qua,do_tin_cay\n" + rows.join("\n"));
+});
+$("btnLogClear").addEventListener("click", () => { if (confirm("Xóa toàn bộ nhật ký trên máy này?")) { localStorage.removeItem("aqs_log"); renderLog(); } });
+
+/* ============================== KIỂM ĐỊNH TRÊN MÁY ============================== */
+function labelFromName(name) {
+  const m = name.toUpperCase().match(/^(BG_WSSV|WSSV|BG|HS)__/);
+  return m ? KEYS.indexOf(m[1]) : -1;
+}
+$("btnVal").addEventListener("click", () => $("fileVal").click());
+$("fileVal").addEventListener("change", async (e) => {
+  const files = Array.from(e.target.files).filter((f) => labelFromName(f.name) >= 0); e.target.value = "";
+  if (!files.length) { $("valStatus").textContent = "Không có tệp nào có nhãn ở đầu tên (BG__, BG_WSSV__, HS__, WSSV__)."; return; }
+  $("btnVal").disabled = true; state.valRows = [];
+  const cm = [0, 1, 2, 3].map(() => [0, 0, 0, 0]); let ms = 0;
+  for (let i = 0; i < files.length; i++) {
+    $("valStatus").innerHTML = '<span class="spinner"></span>Đang chạy ảnh ' + (i + 1) + "/" + files.length + "…";
+    try {
+      const it = await loadImage(files[i]); const r = await infer(to224(it.img)); URL.revokeObjectURL(it.url);
+      const y = labelFromName(files[i].name); cm[y][r.top]++; ms += r.ms;
+      state.valRows.push({ f: files[i].name, y, p: r.top, probs: r.probs });
+    } catch (err) { console.warn(files[i].name, err); }
+  }
+  renderVal(cm, ms); $("btnVal").disabled = false; $("valStatus").textContent = "Đã chạy xong " + state.valRows.length + " ảnh.";
+});
+function renderVal(cm, ms) {
+  const rows = state.valRows, n = rows.length; if (!n) return;
+  const correct = rows.filter((r) => r.y === r.p).length;
+  const isPos = (k) => k === 1 || k === 3;                    // có dấu hiệu đốm trắng = WSSV hoặc BG+WSSV
+  const pos = rows.filter((r) => isPos(r.y)), neg = rows.filter((r) => !isPos(r.y));
+  const tp = pos.filter((r) => isPos(r.p)).length, tn = neg.filter((r) => !isPos(r.p)).length;
+  const low = rows.filter((r) => Math.max.apply(null, r.probs) < CONFIG.REFUSE_BELOW).length;
+  const frac = (a, b) => b ? a + "/" + b + " = " + pct(a / b) : "không có ảnh";
+  $("valSummary").innerHTML =
+    '<div class="kv"><span>Mô hình</span><b>' + $("iModel").textContent + "</b></div>" +
+    '<div class="kv"><span>Số ảnh đã chạy</span><b>' + n + "</b></div>" +
+    '<div class="kv"><span>Độ nhạy với dấu hiệu đốm trắng</span><b id="vSens">' + frac(tp, pos.length) + "</b></div>" +
+    '<div class="kv"><span>Độ đặc hiệu</span><b id="vSpec">' + frac(tn, neg.length) + "</b></div>" +
+    '<div class="kv"><span>Đúng lớp (4 nhóm)</span><b id="vAcc">' + frac(correct, n) + "</b></div>" +
+    '<div class="kv"><span>Ảnh dưới ngưỡng 55%</span><b id="vLow">' + low + "</b></div>" +
+    '<div class="kv"><span>Thời gian trung bình mỗi ảnh</span><b>' + Math.round(ms / n) + " ms</b></div>" +
+    '<div class="kv"><span>Mạng lúc chạy</span><b>' + (navigator.onLine ? "đang bật" : "không có mạng") + "</b></div>";
+  const head = "<tr><th></th>" + KEYS.map((k) => "<th>" + k.replace("_", "+") + "</th>").join("") + "</tr>";
+  $("valCm").innerHTML = "<table>" + head + cm.map((row, i) => "<tr><th>" + KEYS[i].replace("_", "+") + "</th>" +
+    row.map((v, j) => '<td class="' + (i === j ? "diag" : "") + '">' + v + "</td>").join("") + "</tr>").join("") + "</table>";
+  $("valCard").classList.remove("hidden");
+}
+$("btnValCsv").addEventListener("click", () => {
+  const rows = state.valRows.map((r) => [r.f, KEYS[r.y], KEYS[r.p]].concat(r.probs.map((p) => p.toFixed(4))).join(","));
+  download("aquashield_kiem_dinh_tren_may.csv", "tep,nhan_that,du_doan,p_BG,p_BG_WSSV,p_HS,p_WSSV\n" + rows.join("\n"));
+});
+
+/* ============================== NGOẠI TUYẾN ============================== */
+async function checkOffline() {
+  const need = ["index.html", "ort/ort.wasm.min.js", "ort/ort-wasm-simd-threaded.js", "ort/ort-wasm-simd-threaded.wasm"];
+  if (state.model) need.push(state.model.url);
+  try {
+    const cache = await caches.open(CONFIG.CACHE);
+    const hits = await Promise.all(need.map((u) => cache.match(u)));
+    const ok = hits.every(Boolean) && !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+    if (ok) { chip("chipOffline", "Ngoại tuyến: sẵn sàng", "ok"); $("iOffline").textContent = "Đã lưu đủ, dùng được khi không có mạng"; }
+    else { chip("chipOffline", "Ngoại tuyến: đang lưu…", "warn"); $("iOffline").textContent = "Đang lưu vào máy, giữ mạng thêm ít giây"; }
+    return ok;
+  } catch (e) { chip("chipOffline", "Ngoại tuyến: không hỗ trợ", "warn"); $("iOffline").textContent = "Trình duyệt này không lưu được ngoại tuyến"; return false; }
+}
+async function setupOffline() {
+  if (!("serviceWorker" in navigator)) { chip("chipOffline", "Ngoại tuyến: không hỗ trợ", "warn"); return; }
+  try { await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready; } catch (e) { console.warn(e); }
+  for (let i = 0; i < 60; i++) { if (await checkOffline()) break; await new Promise((r) => setTimeout(r, 1000)); }
+  if (navigator.storage && navigator.storage.persist) { try { await navigator.storage.persist(); } catch (e) {} }
+}
+$("btnReset").addEventListener("click", async () => {
+  if (!navigator.onLine) { alert("Đang không có mạng. Hãy bật mạng rồi mới xóa bộ nhớ đệm, nếu không ứng dụng sẽ không mở lại được."); return; }
+  if (!confirm("Tải lại toàn bộ ứng dụng và mô hình từ máy chủ?")) return;
+  try { await Promise.all((await caches.keys()).map((k) => caches.delete(k))); const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map((r) => r.unregister())); } catch (e) {}
+  location.reload();
+});
+
+/* ============================== CÀI ĐẶT MỘT CHẠM ============================== */
+const UA = navigator.userAgent || "";
+const ENV = {
+  standalone: () => window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true,
+  ios: /iPad|iPhone|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1),
+  android: /Android/i.test(UA),
+  inApp: /Zalo|FBAN|FBAV|FB_IAB|Messenger|Instagram|Line\/|TikTok|MicroMessenger|; wv\)/i.test(UA)
+};
+let installEvent = null;
+function installHelp(html) { const h = $("installHelp"); h.innerHTML = html; h.classList.remove("hidden"); }
+const HELP_ANDROID = "Máy chưa hiện hộp cài đặt tự động. Làm tay 3 bước:<ol><li>Bấm dấu <b>⋮</b> ở góc trên bên phải.</li><li>Chọn <b>Thêm vào màn hình chính</b> (hoặc <b>Cài đặt ứng dụng</b>).</li><li>Bấm <b>Cài đặt</b>.</li></ol>";
+const HELP_IOS = "Trên iPhone, làm 3 bước:<ol><li>Bấm nút <b>Chia sẻ</b> (ô vuông có mũi tên hướng lên) ở thanh dưới của Safari.</li><li>Kéo xuống, chọn <b>Thêm vào MH chính</b>.</li><li>Bấm <b>Thêm</b>.</li></ol>";
+function setupInstall() {
+  if (ENV.standalone()) return;                                   // đang chạy như ứng dụng đã cài
+  try { if (sessionStorage.getItem("aqs_later")) return; } catch (e) {}
+  $("installCard").classList.remove("hidden");
+  if (ENV.inApp && ENV.android) $("btnInstall").textContent = "Mở bằng Chrome để cài";
+  else if (ENV.inApp && ENV.ios) { $("btnInstall").classList.add("hidden"); installHelp("Trình duyệt này không cài được ứng dụng. Bấm dấu <b>⋯</b> ở góc màn hình, chọn <b>Mở bằng Safari</b>, rồi bấm lại nút cài đặt."); }
+  else if (ENV.ios) $("btnInstall").textContent = "Cách cài trên iPhone";
+}
+$("btnInstall").addEventListener("click", async () => {
+  if (ENV.inApp && ENV.android) {
+    location.href = "intent://" + location.host + location.pathname + "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" + encodeURIComponent(location.href) + ";end";
+    setTimeout(() => installHelp("Nếu Chrome không tự mở: bấm dấu <b>⋮</b> hoặc <b>⋯</b> ở góc màn hình và chọn <b>Mở bằng trình duyệt</b>."), 1500);
+    return;
+  }
+  if (ENV.ios) { installHelp(HELP_IOS); return; }
+  if (!installEvent) { installHelp(HELP_ANDROID); return; }
+  const ev = installEvent; installEvent = null;
+  try { ev.prompt(); const choice = await ev.userChoice;
+        if (choice && choice.outcome === "accepted") installHelp("Đang cài. Vài giây nữa biểu tượng <b>AquaShield</b> sẽ có trên màn hình chính.");
+        else installHelp("Anh/chị chưa đồng ý cài. Bấm lại nút trên khi muốn cài."); }
+  catch (e) { installHelp(HELP_ANDROID); }
+});
+$("installLater").addEventListener("click", (e) => { e.preventDefault(); $("installCard").classList.add("hidden"); try { sessionStorage.setItem("aqs_later", "1"); } catch (err) {} });
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvent = e; $("installHelp").classList.add("hidden"); });
+window.addEventListener("appinstalled", () => {
+  installEvent = null; $("btnInstall").classList.add("hidden"); $("installLater").classList.add("hidden");
+  $("installTitle").textContent = "Đã cài xong";
+  $("installText").textContent = "Mở AquaShield từ biểu tượng trên màn hình chính. Lần đầu nên mở khi còn mạng, chờ nhãn “Ngoại tuyến: sẵn sàng”.";
+  $("installHelp").classList.add("hidden");
+});
+setupInstall();
+
+/* ============================== KHỞI ĐỘNG ============================== */
+(async () => { await loadModel(); setupOffline(); })();
+</script>
+</body>
+</html>
